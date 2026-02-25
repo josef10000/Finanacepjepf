@@ -16,12 +16,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
+    // Fallback timeout in case Firebase Auth is blocked by network/extensions
+    const timeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn("Firebase Auth timeout. Proceeding without user.");
+        setLoading(false);
+      }
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (!isMounted) return;
+      clearTimeout(timeout);
       setUser(currentUser);
       setLoading(false);
+    }, (error) => {
+      console.error("Auth error:", error);
+      if (isMounted) {
+        clearTimeout(timeout);
+        setLoading(false);
+      }
     });
-    return () => unsubscribe();
-  }, []);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+      unsubscribe();
+    };
+  }, [loading]);
 
   const signIn = async () => {
     await signInWithGoogle();

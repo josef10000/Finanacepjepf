@@ -54,6 +54,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (!user) {
       setData(null);
       setLoading(false);
@@ -62,7 +64,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const userRef = ref(db, `users/${user.uid}`);
     
+    // Safety timeout to ensure app loads even if Firebase DB is unresponsive
+    const timeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn("Firebase DB timeout. Using local state.");
+        const initialData: DBState = {
+          PJ: createEmptyState('PJ'),
+          PF: createEmptyState('PF')
+        };
+        setData(initialData);
+        setLoading(false);
+      }
+    }, 5000);
+
     const unsubscribe = onValue(userRef, (snapshot) => {
+      if (!isMounted) return;
+      clearTimeout(timeout);
       const val = snapshot.val();
       if (val) {
         const sanitizeState = (state: any, type: 'PJ' | 'PF'): AppState => ({
@@ -96,6 +113,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setLoading(false);
     }, (error) => {
+      if (!isMounted) return;
+      clearTimeout(timeout);
       console.error("Firebase DB Error:", error);
       // Fallback to local state so the app doesn't hang on permission denied
       const initialData: DBState = {
@@ -106,8 +125,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, [user]);
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+      unsubscribe();
+    };
+  }, [user, loading]);
 
   const updateData = async (newData: DBState) => {
     if (!user) return;
