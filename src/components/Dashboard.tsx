@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { DashboardView } from './DashboardView';
+import { AccountsView } from './AccountsView';
+import { CategoriesView } from './CategoriesView';
+import { TransactionsView } from './TransactionsView';
 import { 
   PieChart, List, CreditCard, Calendar, TrendingUp, CheckSquare, 
   Layers, Rocket, Calculator, Share2, Flag, Archive, Book, 
@@ -49,6 +53,26 @@ export const Dashboard: React.FC = () => {
     item.common || (profile === 'PJ' && item.pjOnly) || (profile === 'PF' && item.pfOnly)
   );
 
+  const renderPageContent = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return <DashboardView profile={profile} />;
+      case 'accounts':
+        return <AccountsView profile={profile} />;
+      case 'categories':
+        return <CategoriesView profile={profile} />;
+      case 'transactions':
+        return <TransactionsView profile={profile} />;
+      default:
+        return (
+          <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400">
+            <p>Conteúdo da página {currentPage} em desenvolvimento...</p>
+            <p className="mt-2 text-sm">Os dados serão sincronizados com Firebase Realtime Database.</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className={`flex h-screen bg-slate-900 text-slate-200 font-sans antialiased ${profile === 'PF' ? 'theme-pf' : 'theme-pj'}`}>
       {/* SIDEBAR */}
@@ -61,13 +85,13 @@ export const Dashboard: React.FC = () => {
           {/* PROFILE TOGGLE */}
           <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-700 mb-2">
             <button 
-              onClick={() => setProfile('PJ')} 
+              onClick={() => { setProfile('PJ'); setCurrentPage('dashboard'); }} 
               className={`flex-1 py-2 text-xs font-bold rounded transition-all ${profile === 'PJ' ? 'text-white bg-blue-600 shadow' : 'text-slate-400 hover:text-white'}`}
             >
               Empresa (PJ)
             </button>
             <button 
-              onClick={() => setProfile('PF')} 
+              onClick={() => { setProfile('PF'); setCurrentPage('dashboard'); }} 
               className={`flex-1 py-2 text-xs font-bold rounded transition-all ${profile === 'PF' ? 'text-white bg-purple-600 shadow' : 'text-slate-400 hover:text-white'}`}
             >
               Pessoal (PF)
@@ -127,11 +151,7 @@ export const Dashboard: React.FC = () => {
             </h2>
           </div>
           
-          {/* Placeholder for page content */}
-          <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400">
-            <p>Conteúdo da página {currentPage} em desenvolvimento...</p>
-            <p className="mt-2 text-sm">Os dados serão sincronizados com Firebase Realtime Database.</p>
-          </div>
+          {renderPageContent()}
         </div>
       </main>
     </div>

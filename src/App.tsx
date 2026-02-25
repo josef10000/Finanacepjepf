@@ -1,5 +1,6 @@
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
 
@@ -14,7 +15,13 @@ const AppContent: React.FC = () => {
     );
   }
 
-  return user ? <Dashboard /> : <Login />;
+  return user ? (
+    <DataProvider>
+      <Dashboard />
+    </DataProvider>
+  ) : (
+    <Login />
+  );
 };
 
 export const App: React.FC = () => {
