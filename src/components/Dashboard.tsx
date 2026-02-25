@@ -1,31 +1,20 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { DashboardView } from './DashboardView';
-import { AccountsView } from './AccountsView';
-import { CategoriesView } from './CategoriesView';
 import { TransactionsView } from './TransactionsView';
-import { CardsView } from './CardsView';
-import { GoalsView } from './GoalsView';
-import { CalendarView } from './CalendarView';
-import { RecurringView } from './RecurringView';
-import { ReportsView } from './ReportsView';
-import { BudgetView } from './BudgetView';
-import { BalanceView } from './BalanceView';
-import { StackView } from './StackView';
-import { DREView } from './DREView';
-import { DistributionView } from './DistributionView';
-import { ChecklistView } from './ChecklistView';
-import { DigitalToolsView } from './DigitalToolsView';
-import { AutomationView } from './AutomationView';
-import { ProjectionsView } from './ProjectionsView';
 import { 
-  PieChart, List, CreditCard, Calendar, TrendingUp, CheckSquare, 
-  Layers, Rocket, Calculator, Share2, Flag, Archive, Book, 
-  BarChart2, Tags, Zap, Wallet, Repeat, LogOut
+  FinanceHubView, 
+  PlanningHubView, 
+  AnalyticsHubView, 
+  WorkspaceHubView, 
+  SettingsHubView 
+} from './HubViews';
+import { 
+  PieChart, List, Wallet, Target, BarChart2, Layers, Settings, LogOut
 } from 'lucide-react';
 
 type Profile = 'PJ' | 'PF';
-type Page = 'dashboard' | 'transactions' | 'cards' | 'calendar' | 'projections' | 'checklist' | 'stack' | 'digital-tools' | 'dre' | 'distribution' | 'goals' | 'budget' | 'balance' | 'reports' | 'categories' | 'automation' | 'accounts' | 'recurring';
+type Page = 'dashboard' | 'transactions' | 'finance' | 'planning' | 'analytics' | 'workspace' | 'settings';
 
 export const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -33,83 +22,35 @@ export const Dashboard: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
 
   const navItems = [
-    { id: 'dashboard', icon: PieChart, label: 'Dashboard', common: true },
-    { id: 'transactions', icon: List, label: 'Lançamentos', common: true },
-    { id: 'cards', icon: CreditCard, label: 'Cartões', common: true },
-    { id: 'calendar', icon: Calendar, label: 'Calendário', common: true },
-    
-    // PJ Specific
-    { id: 'projections', icon: TrendingUp, label: 'Fluxo de Caixa', pjOnly: true },
-    { id: 'checklist', icon: CheckSquare, label: 'Checklist', pjOnly: true },
-    { id: 'stack', icon: Layers, label: 'Stack', pjOnly: true },
-    { id: 'digital-tools', icon: Rocket, label: 'Ferramentas', pjOnly: true },
-    { id: 'dre', icon: Calculator, label: 'DRE', pjOnly: true },
-    { id: 'distribution', icon: Share2, label: 'Distribuição', pjOnly: true },
-    
-    // PF Specific
-    { id: 'projections', icon: TrendingUp, label: 'FIRE', pfOnly: true },
-    { id: 'stack', icon: Layers, label: 'Assinaturas', pfOnly: true },
-    
-    // Strategy
-    { id: 'goals', icon: Flag, label: profile === 'PJ' ? 'Potes' : 'Sonhos', common: true },
-    { id: 'budget', icon: Archive, label: 'Orçamento', common: true },
-    { id: 'balance', icon: Book, label: profile === 'PJ' ? 'Balanço' : 'Patrimônio', common: true },
-    { id: 'reports', icon: BarChart2, label: 'Relatórios', common: true },
-    
-    // Config
-    { id: 'categories', icon: Tags, label: 'Categorias', common: true },
-    { id: 'automation', icon: Zap, label: 'Automação', common: true },
-    { id: 'accounts', icon: Wallet, label: 'Contas', common: true },
-    { id: 'recurring', icon: Repeat, label: 'Recorrências', common: true },
+    { id: 'dashboard', icon: PieChart, label: 'Dashboard' },
+    { id: 'transactions', icon: List, label: 'Lançamentos' },
+    { id: 'finance', icon: Wallet, label: 'Contas & Cartões' },
+    { id: 'planning', icon: Target, label: 'Planejamento' },
+    { id: 'analytics', icon: BarChart2, label: 'Inteligência' },
+    { id: 'workspace', icon: Layers, label: 'Workspace' },
+    { id: 'settings', icon: Settings, label: 'Configurações' },
   ];
-
-  const visibleNavItems = navItems.filter(item => 
-    item.common || (profile === 'PJ' && item.pjOnly) || (profile === 'PF' && item.pfOnly)
-  );
 
   const renderPageContent = () => {
     switch (currentPage) {
       case 'dashboard':
         return <DashboardView profile={profile} />;
-      case 'accounts':
-        return <AccountsView profile={profile} />;
-      case 'categories':
-        return <CategoriesView profile={profile} />;
       case 'transactions':
         return <TransactionsView profile={profile} />;
-      case 'cards':
-        return <CardsView profile={profile} />;
-      case 'goals':
-        return <GoalsView profile={profile} />;
-      case 'calendar':
-        return <CalendarView profile={profile} />;
-      case 'recurring':
-        return <RecurringView profile={profile} />;
-      case 'reports':
-        return <ReportsView profile={profile} />;
-      case 'budget':
-        return <BudgetView profile={profile} />;
-      case 'balance':
-        return <BalanceView profile={profile} />;
-      case 'stack':
-        return <StackView profile={profile} />;
-      case 'dre':
-        return <DREView profile={profile} />;
-      case 'distribution':
-        return <DistributionView profile={profile} />;
-      case 'checklist':
-        return <ChecklistView profile={profile} />;
-      case 'digital-tools':
-        return <DigitalToolsView profile={profile} />;
-      case 'automation':
-        return <AutomationView profile={profile} />;
-      case 'projections':
-        return <ProjectionsView profile={profile} />;
+      case 'finance':
+        return <FinanceHubView profile={profile} />;
+      case 'planning':
+        return <PlanningHubView profile={profile} />;
+      case 'analytics':
+        return <AnalyticsHubView profile={profile} />;
+      case 'workspace':
+        return <WorkspaceHubView profile={profile} />;
+      case 'settings':
+        return <SettingsHubView profile={profile} />;
       default:
         return (
           <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400">
             <p>Conteúdo da página {currentPage} em desenvolvimento...</p>
-            <p className="mt-2 text-sm">Os dados serão sincronizados com Firebase Realtime Database.</p>
           </div>
         );
     }
@@ -143,7 +84,7 @@ export const Dashboard: React.FC = () => {
         
         <div className="flex-1 overflow-y-auto py-4 custom-scrollbar">
           <ul className="flex flex-col px-3 space-y-1">
-            {visibleNavItems.map((item, index) => {
+            {navItems.map((item, index) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
               return (
@@ -189,7 +130,7 @@ export const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto pb-24">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <h2 className="text-3xl font-bold text-white tracking-tight capitalize">
-              {visibleNavItems.find(i => i.id === currentPage)?.label || 'Dashboard'}
+              {navItems.find(i => i.id === currentPage)?.label || 'Dashboard'}
             </h2>
           </div>
           

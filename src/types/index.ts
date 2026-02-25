@@ -26,7 +26,7 @@ export interface Category {
   id: string;
   name: string;
   type: TransactionType;
-  dre?: string;
+  dre?: 'impostos' | 'custos_diretos' | 'despesas_op' | 'despesas_fin' | 'receitas_fin' | 'outros';
   sub?: string;
 }
 
@@ -62,6 +62,8 @@ export interface StackItem {
   cost: number;
   billingCycle: 'monthly' | 'yearly';
   category: string;
+  purpose?: string;
+  url?: string;
 }
 
 export interface DistributionRule {

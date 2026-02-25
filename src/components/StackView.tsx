@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { StackItem } from '../types';
 import { formatCurrency } from '../utils/format';
-import { Layers, Plus, Trash2, DollarSign } from 'lucide-react';
+import { Layers, Plus, Trash2, DollarSign, ExternalLink } from 'lucide-react';
 
 export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
   const { data, updateData } = useData();
@@ -13,6 +13,8 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
   const [cost, setCost] = useState('');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [category, setCategory] = useState('');
+  const [purpose, setPurpose] = useState('');
+  const [url, setUrl] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +25,9 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
       name,
       cost: parseFloat(cost) || 0,
       billingCycle,
-      category: category || 'Geral'
+      category: category || 'Geral',
+      purpose: purpose || undefined,
+      url: url || undefined
     };
 
     const newData = {
@@ -38,6 +42,8 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
     setName('');
     setCost('');
     setCategory('');
+    setPurpose('');
+    setUrl('');
     setShowForm(false);
   };
 
@@ -63,7 +69,7 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-bold text-white">
-          {profile === 'PJ' ? 'Stack de Ferramentas' : 'Assinaturas'}
+          {profile === 'PJ' ? 'Stack & Ferramentas' : 'Assinaturas'}
         </h3>
         <button 
           onClick={() => setShowForm(!showForm)}
@@ -96,6 +102,18 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
               <label className="text-xs text-slate-400 block mb-1">Categoria (Opcional)</label>
               <input type="text" value={category} onChange={e => setCategory(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" placeholder="Ex: Marketing, Lazer" />
             </div>
+            {profile === 'PJ' && (
+              <>
+                <div className="lg:col-span-2">
+                  <label className="text-xs text-slate-400 block mb-1">Propósito (Opcional)</label>
+                  <input type="text" value={purpose} onChange={e => setPurpose(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" placeholder="Ex: Gestão de Projetos" />
+                </div>
+                <div className="lg:col-span-2">
+                  <label className="text-xs text-slate-400 block mb-1">URL (Opcional)</label>
+                  <input type="url" value={url} onChange={e => setUrl(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" placeholder="https://" />
+                </div>
+              </>
+            )}
             <div className="lg:col-span-4 flex justify-end gap-2 mt-2">
               <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded text-slate-300 hover:bg-slate-700 transition-colors">Cancelar</button>
               <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded font-bold transition-colors">Salvar Item</button>
@@ -128,6 +146,7 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
               <tr>
                 <th className="px-6 py-4">Nome</th>
                 <th className="px-6 py-4">Categoria</th>
+                {profile === 'PJ' && <th className="px-6 py-4">Propósito</th>}
                 <th className="px-6 py-4">Ciclo</th>
                 <th className="px-6 py-4 text-right">Custo</th>
                 <th className="px-6 py-4 text-center">Ações</th>
@@ -136,7 +155,7 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
             <tbody className="divide-y divide-slate-700">
               {stack.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={profile === 'PJ' ? 6 : 5} className="px-6 py-8 text-center text-slate-500">
                     Nenhum item cadastrado.
                   </td>
                 </tr>
@@ -145,13 +164,23 @@ export const StackView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
                   <tr key={item.id} className="hover:bg-slate-700/30 transition-colors group">
                     <td className="px-6 py-4 font-medium text-slate-300 flex items-center gap-2">
                       <Layers size={16} className="text-blue-500" />
-                      {item.name}
+                      {item.url ? (
+                        <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-blue-400 transition-colors">
+                          {item.name}
+                          <ExternalLink size={12} />
+                        </a>
+                      ) : (
+                        item.name
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span className="px-2 py-1 bg-slate-700 rounded text-xs">
                         {item.category}
                       </span>
                     </td>
+                    {profile === 'PJ' && (
+                      <td className="px-6 py-4 text-slate-400">{item.purpose || '-'}</td>
+                    )}
                     <td className="px-6 py-4">
                       {item.billingCycle === 'monthly' ? 'Mensal' : 'Anual'}
                     </td>
