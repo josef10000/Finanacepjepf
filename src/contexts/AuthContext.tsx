@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, signInWithGoogle, logout } from './firebase';
+import { auth, signInWithGoogle, logout } from '../lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -20,7 +20,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(currentUser);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
