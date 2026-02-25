@@ -61,6 +61,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const userRef = ref(db, `users/${user.uid}`);
+    
     const unsubscribe = onValue(userRef, (snapshot) => {
       const val = snapshot.val();
       if (val) {
@@ -91,8 +92,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           PF: createEmptyState('PF')
         };
         setData(initialData);
-        set(userRef, initialData);
+        set(userRef, initialData).catch(err => console.error("Failed to init DB:", err));
       }
+      setLoading(false);
+    }, (error) => {
+      console.error("Firebase DB Error:", error);
+      // Fallback to local state so the app doesn't hang on permission denied
+      const initialData: DBState = {
+        PJ: createEmptyState('PJ'),
+        PF: createEmptyState('PF')
+      };
+      setData(initialData);
       setLoading(false);
     });
 
@@ -102,7 +112,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateData = async (newData: DBState) => {
     if (!user) return;
     setData(newData); // Optimistic update
-    await set(ref(db, `users/${user.uid}`), newData);
+    try {
+      await set(ref(db, `users/${user.uid}`), newData);
+    } catch (error) {
+      console.error("Failed to save data to Firebase:", error);
+    }
   };
 
   return (
