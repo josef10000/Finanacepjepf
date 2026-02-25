@@ -32,6 +32,8 @@ function createEmptyState(type: 'PJ' | 'PF'): AppState {
     rules: [], 
     stack: [], 
     checklist: [], 
+    digitalTools: [],
+    automations: [],
     launchEvents: [], 
     capTable: [], 
     taxRate: 6.0, 
@@ -95,6 +97,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           rules: state.rules || [],
           stack: state.stack || [],
           checklist: state.checklist || [],
+          digitalTools: state.digitalTools || [],
+          automations: state.automations || [],
           launchEvents: state.launchEvents || [],
           capTable: state.capTable || [],
         });

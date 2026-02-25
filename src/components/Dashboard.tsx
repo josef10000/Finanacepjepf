@@ -6,6 +6,18 @@ import { CategoriesView } from './CategoriesView';
 import { TransactionsView } from './TransactionsView';
 import { CardsView } from './CardsView';
 import { GoalsView } from './GoalsView';
+import { CalendarView } from './CalendarView';
+import { RecurringView } from './RecurringView';
+import { ReportsView } from './ReportsView';
+import { BudgetView } from './BudgetView';
+import { BalanceView } from './BalanceView';
+import { StackView } from './StackView';
+import { DREView } from './DREView';
+import { DistributionView } from './DistributionView';
+import { ChecklistView } from './ChecklistView';
+import { DigitalToolsView } from './DigitalToolsView';
+import { AutomationView } from './AutomationView';
+import { ProjectionsView } from './ProjectionsView';
 import { 
   PieChart, List, CreditCard, Calendar, TrendingUp, CheckSquare, 
   Layers, Rocket, Calculator, Share2, Flag, Archive, Book, 
@@ -69,6 +81,30 @@ export const Dashboard: React.FC = () => {
         return <CardsView profile={profile} />;
       case 'goals':
         return <GoalsView profile={profile} />;
+      case 'calendar':
+        return <CalendarView profile={profile} />;
+      case 'recurring':
+        return <RecurringView profile={profile} />;
+      case 'reports':
+        return <ReportsView profile={profile} />;
+      case 'budget':
+        return <BudgetView profile={profile} />;
+      case 'balance':
+        return <BalanceView profile={profile} />;
+      case 'stack':
+        return <StackView profile={profile} />;
+      case 'dre':
+        return <DREView profile={profile} />;
+      case 'distribution':
+        return <DistributionView profile={profile} />;
+      case 'checklist':
+        return <ChecklistView profile={profile} />;
+      case 'digital-tools':
+        return <DigitalToolsView profile={profile} />;
+      case 'automation':
+        return <AutomationView profile={profile} />;
+      case 'projections':
+        return <ProjectionsView profile={profile} />;
       default:
         return (
           <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400">

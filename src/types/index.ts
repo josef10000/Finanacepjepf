@@ -49,17 +49,62 @@ export interface RecurringTransaction {
   nextDate: string;
 }
 
+export interface Budget {
+  id: string;
+  categoryId: string;
+  amount: number;
+  period: 'monthly' | 'yearly';
+}
+
+export interface StackItem {
+  id: string;
+  name: string;
+  cost: number;
+  billingCycle: 'monthly' | 'yearly';
+  category: string;
+}
+
+export interface DistributionRule {
+  id: string;
+  name: string;
+  percentage: number;
+  destinationAccountId: string;
+}
+
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  completed: boolean;
+  month: string;
+}
+
+export interface DigitalTool {
+  id: string;
+  name: string;
+  purpose: string;
+  url?: string;
+}
+
+export interface AutomationRule {
+  id: string;
+  trigger: string;
+  action: string;
+  active: boolean;
+}
+
 export interface AppState {
   transactions: Transaction[];
   accounts: Account[];
   categories: Category[];
   goals: Goal[];
-  budgets: any[];
+  budgets: Budget[];
   recurring: RecurringTransaction[];
   tags: string[];
-  rules: any[];
-  stack: any[];
-  checklist: any[];
+  rules: DistributionRule[];
+  stack: StackItem[];
+  checklist: ChecklistItem[];
+  digitalTools: DigitalTool[];
+  automations: AutomationRule[];
   launchEvents: any[];
   capTable: any[];
   taxRate: number;

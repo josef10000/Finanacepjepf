@@ -12,6 +12,8 @@ export const AccountsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) =>
   const [type, setType] = useState<AccountType>('operational');
   const [initialBalance, setInitialBalance] = useState('');
   const [limit, setLimit] = useState('');
+  const [closingDay, setClosingDay] = useState('');
+  const [dueDay, setDueDay] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +25,8 @@ export const AccountsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) =>
       type,
       initialBalance: parseFloat(initialBalance) || 0,
       limit: type === 'credit_card' ? parseFloat(limit) || 0 : undefined,
+      closingDay: type === 'credit_card' ? parseInt(closingDay) || undefined : undefined,
+      dueDay: type === 'credit_card' ? parseInt(dueDay) || undefined : undefined,
     };
 
     const newData = {
@@ -37,6 +41,8 @@ export const AccountsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) =>
     setName('');
     setInitialBalance('');
     setLimit('');
+    setClosingDay('');
+    setDueDay('');
   };
 
   const handleDelete = async (id: string) => {
@@ -85,10 +91,22 @@ export const AccountsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) =>
             <input type="number" step="0.01" value={initialBalance} onChange={e => setInitialBalance(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" required placeholder="0.00" />
           </div>
           {type === 'credit_card' && (
-            <div>
-              <label className="text-xs text-slate-400 block mb-1">Limite do Cartão (R$)</label>
-              <input type="number" step="0.01" value={limit} onChange={e => setLimit(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" required placeholder="0.00" />
-            </div>
+            <>
+              <div>
+                <label className="text-xs text-slate-400 block mb-1">Limite do Cartão (R$)</label>
+                <input type="number" step="0.01" value={limit} onChange={e => setLimit(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" required placeholder="0.00" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">Dia de Fechamento</label>
+                  <input type="number" min="1" max="31" value={closingDay} onChange={e => setClosingDay(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" required placeholder="Ex: 25" />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">Dia de Vencimento</label>
+                  <input type="number" min="1" max="31" value={dueDay} onChange={e => setDueDay(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" required placeholder="Ex: 5" />
+                </div>
+              </div>
+            </>
           )}
           <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">
             Salvar Conta
@@ -115,6 +133,9 @@ export const AccountsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) =>
                     <p className="text-sm text-slate-400">
                       {acc.type === 'credit_card' ? `Limite: ${formatCurrency(acc.limit || 0)}` : formatCurrency(acc.initialBalance)}
                     </p>
+                    {acc.type === 'credit_card' && acc.dueDay && (
+                      <p className="text-xs text-slate-500">Vence dia {acc.dueDay} • Fecha dia {acc.closingDay}</p>
+                    )}
                   </div>
                 </div>
                 <button onClick={() => handleDelete(acc.id)} className="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-2">
