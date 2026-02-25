@@ -30,13 +30,32 @@ export interface Category {
   sub?: string;
 }
 
+export interface Goal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline?: string;
+}
+
+export interface RecurringTransaction {
+  id: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  accountId: string;
+  categoryId: string;
+  frequency: 'monthly' | 'yearly';
+  nextDate: string;
+}
+
 export interface AppState {
   transactions: Transaction[];
   accounts: Account[];
   categories: Category[];
-  goals: any[];
+  goals: Goal[];
   budgets: any[];
-  recurring: any[];
+  recurring: RecurringTransaction[];
   tags: string[];
   rules: any[];
   stack: any[];

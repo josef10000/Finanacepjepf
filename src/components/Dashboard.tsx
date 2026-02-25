@@ -4,6 +4,8 @@ import { DashboardView } from './DashboardView';
 import { AccountsView } from './AccountsView';
 import { CategoriesView } from './CategoriesView';
 import { TransactionsView } from './TransactionsView';
+import { CardsView } from './CardsView';
+import { GoalsView } from './GoalsView';
 import { 
   PieChart, List, CreditCard, Calendar, TrendingUp, CheckSquare, 
   Layers, Rocket, Calculator, Share2, Flag, Archive, Book, 
@@ -63,6 +65,10 @@ export const Dashboard: React.FC = () => {
         return <CategoriesView profile={profile} />;
       case 'transactions':
         return <TransactionsView profile={profile} />;
+      case 'cards':
+        return <CardsView profile={profile} />;
+      case 'goals':
+        return <GoalsView profile={profile} />;
       default:
         return (
           <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400">
