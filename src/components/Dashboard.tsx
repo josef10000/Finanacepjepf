@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useData } from '../contexts/DataContext';
 import { DashboardView } from './DashboardView';
 import { TransactionsView } from './TransactionsView';
 import { 
@@ -10,14 +11,21 @@ import {
   SettingsHubView 
 } from './HubViews';
 import { 
-  PieChart, List, Wallet, Target, BarChart2, Layers, Settings, LogOut
+  PieChart, List, Wallet, Target, BarChart2, Layers, Settings, LogOut, Eye, EyeOff, ChevronLeft, ChevronRight
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 type Profile = 'PJ' | 'PF';
 type Page = 'dashboard' | 'transactions' | 'finance' | 'planning' | 'analytics' | 'workspace' | 'settings';
 
+const MONTHS = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+];
+
 export const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { privacyMode, togglePrivacyMode, globalMonth, setGlobalMonth, globalYear, setGlobalYear } = useData();
   const [profile, setProfile] = useState<Profile>('PJ');
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
 
@@ -30,6 +38,24 @@ export const Dashboard: React.FC = () => {
     { id: 'workspace', icon: Layers, label: 'Workspace' },
     { id: 'settings', icon: Settings, label: 'Configurações' },
   ];
+
+  const handlePrevMonth = () => {
+    if (globalMonth === 0) {
+      setGlobalMonth(11);
+      setGlobalYear(globalYear - 1);
+    } else {
+      setGlobalMonth(globalMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (globalMonth === 11) {
+      setGlobalMonth(0);
+      setGlobalYear(globalYear + 1);
+    } else {
+      setGlobalMonth(globalMonth + 1);
+    }
+  };
 
   const renderPageContent = () => {
     switch (currentPage) {
@@ -126,15 +152,45 @@ export const Dashboard: React.FC = () => {
       </nav>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 relative bg-slate-900">
+      <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 relative bg-slate-900 custom-scrollbar">
         <div className="max-w-7xl mx-auto pb-24">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <h2 className="text-3xl font-bold text-white tracking-tight capitalize">
               {navItems.find(i => i.id === currentPage)?.label || 'Dashboard'}
             </h2>
+            
+            {/* TOP BAR CONTROLS */}
+            <div className="flex items-center gap-4 bg-slate-800 p-2 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-2 px-2">
+                <button onClick={handlePrevMonth} className="text-slate-400 hover:text-white transition-colors">
+                  <ChevronLeft size={20} />
+                </button>
+                <span className="text-sm font-bold text-white w-32 text-center">
+                  {MONTHS[globalMonth]} {globalYear}
+                </span>
+                <button onClick={handleNextMonth} className="text-slate-400 hover:text-white transition-colors">
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+              <div className="w-px h-6 bg-slate-700"></div>
+              <button 
+                onClick={togglePrivacyMode}
+                className={`p-2 rounded-lg transition-colors ${privacyMode ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-white hover:bg-slate-700'}`}
+                title={privacyMode ? "Mostrar Valores" : "Ocultar Valores"}
+              >
+                {privacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
           
-          {renderPageContent()}
+          <motion.div
+            key={currentPage + profile}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderPageContent()}
+          </motion.div>
         </div>
       </main>
     </div>

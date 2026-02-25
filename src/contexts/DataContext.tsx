@@ -46,6 +46,12 @@ interface DataContextType {
   data: DBState | null;
   updateData: (newData: DBState) => Promise<void>;
   loading: boolean;
+  privacyMode: boolean;
+  togglePrivacyMode: () => void;
+  globalMonth: number;
+  setGlobalMonth: (month: number) => void;
+  globalYear: number;
+  setGlobalYear: (year: number) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -54,6 +60,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user } = useAuth();
   const [data, setData] = useState<DBState | null>(null);
   const [loading, setLoading] = useState(true);
+  const [privacyMode, setPrivacyMode] = useState(false);
+  const [globalMonth, setGlobalMonth] = useState(new Date().getMonth());
+  const [globalYear, setGlobalYear] = useState(new Date().getFullYear());
+
+  const togglePrivacyMode = () => setPrivacyMode(prev => !prev);
 
   useEffect(() => {
     let isMounted = true;
@@ -147,7 +158,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <DataContext.Provider value={{ data, updateData, loading }}>
+    <DataContext.Provider value={{ 
+      data, 
+      updateData, 
+      loading,
+      privacyMode,
+      togglePrivacyMode,
+      globalMonth,
+      setGlobalMonth,
+      globalYear,
+      setGlobalYear
+    }}>
       {children}
     </DataContext.Provider>
   );

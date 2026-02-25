@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Transaction, TransactionType } from '../types';
 import { formatCurrency, formatDate } from '../utils/format';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Paperclip } from 'lucide-react';
 
 export const TransactionsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }) => {
-  const { data, updateData } = useData();
+  const { data, updateData, privacyMode, globalMonth, globalYear } = useData();
   const state = data?.[profile];
 
   const [showForm, setShowForm] = useState(false);
@@ -56,10 +56,24 @@ export const TransactionsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }
     await updateData(newData);
   };
 
+  const filteredTransactions = useMemo(() => {
+    if (!state) return [];
+    return state.transactions
+      .filter(tx => {
+        const txDate = new Date(tx.date);
+        return txDate.getMonth() === globalMonth && txDate.getFullYear() === globalYear;
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [state, globalMonth, globalYear]);
+
   if (!state) return null;
 
-  const sortedTx = [...state.transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const filteredCategories = state.categories.filter(c => c.type === type || c.type === 'transfer');
+
+  const renderValue = (val: number | string) => {
+    if (privacyMode) return <span className="privacy-blur">R$ •••••</span>;
+    return typeof val === 'number' ? formatCurrency(val) : val;
+  };
 
   return (
     <div className="space-y-6">
@@ -136,14 +150,14 @@ export const TransactionsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
-              {sortedTx.length === 0 ? (
+              {filteredTransactions.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                    Nenhum lançamento encontrado.
+                    Nenhum lançamento encontrado para este período.
                   </td>
                 </tr>
               ) : (
-                sortedTx.map(tx => {
+                filteredTransactions.map(tx => {
                   const cat = state.categories.find(c => c.id === tx.categoryId);
                   const acc = state.accounts.find(a => a.id === tx.accountId);
                   return (
@@ -159,10 +173,13 @@ export const TransactionsView: React.FC<{ profile: 'PJ' | 'PF' }> = ({ profile }
                         tx.type === 'despesa' ? 'text-red-400' : 'text-slate-400'
                       }`}>
                         {tx.type === 'despesa' ? '-' : tx.type === 'receita' ? '+' : ''}
-                        {formatCurrency(tx.amount)}
+                        {renderValue(tx.amount)}
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <button onClick={() => handleDelete(tx.id)} className="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <td className="px-6 py-4 text-center flex justify-center gap-3">
+                        <button className="text-slate-500 hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Anexar Comprovante">
+                          <Paperclip size={18} />
+                        </button>
+                        <button onClick={() => handleDelete(tx.id)} className="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Excluir">
                           <Trash2 size={18} />
                         </button>
                       </td>
